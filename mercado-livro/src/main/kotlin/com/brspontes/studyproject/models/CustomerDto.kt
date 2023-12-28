@@ -1,5 +1,6 @@
 package com.brspontes.studyproject.models
 
+import com.brspontes.studyproject.enums.CustomerStatus
 import jakarta.persistence.*
 
 @Entity(name = "customer")
@@ -12,5 +13,9 @@ data class CustomerDto(
         var email: String,
 
         @Column
-        var name: String
+        var name: String,
+
+        @Column
+        @Enumerated(EnumType.STRING)
+        var status: CustomerStatus
 )

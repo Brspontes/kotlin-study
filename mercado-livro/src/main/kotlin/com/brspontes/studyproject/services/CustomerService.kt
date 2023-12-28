@@ -2,6 +2,7 @@ package com.brspontes.studyproject.services
 
 import com.brspontes.studyproject.controllers.requests.PostCustomerRequest
 import com.brspontes.studyproject.controllers.requests.PutCustomerRequest
+import com.brspontes.studyproject.enums.CustomerStatus
 import com.brspontes.studyproject.models.CustomerDto
 import com.brspontes.studyproject.repository.CustomerRepository
 import org.springframework.stereotype.Service
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import java.util.*
 
 @Service
-class CustomerService(val customerRepository: CustomerRepository) {
+class CustomerService(val customerRepository: CustomerRepository, val bookService: BookService) {
     val customers = mutableListOf<CustomerDto>()
 
     fun getAll(name: String?): List<CustomerDto> {
@@ -33,10 +34,11 @@ class CustomerService(val customerRepository: CustomerRepository) {
     }
 
     fun removeCustomer(id: Int) {
-        if(!customerRepository.existsById(id)) {
-            throw Exception()
-        }
-        customerRepository.deleteById(id)
+        val customer = getCustomer(id)
+        bookService.deleteByCustomer(customer!!)
+
+        customer.status = CustomerStatus.INATIVO
+        customerRepository.save(customer)
     }
 
     fun createCustomer(@RequestBody customer: CustomerDto) {

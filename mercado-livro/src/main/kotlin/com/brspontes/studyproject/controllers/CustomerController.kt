@@ -2,7 +2,9 @@ package com.brspontes.studyproject.controllers
 
 import com.brspontes.studyproject.controllers.requests.PostCustomerRequest
 import com.brspontes.studyproject.controllers.requests.PutCustomerRequest
+import com.brspontes.studyproject.controllers.response.CustomerResponse
 import com.brspontes.studyproject.extensions.toCustomerModel
+import com.brspontes.studyproject.extensions.toCustomerResponse
 import com.brspontes.studyproject.models.CustomerDto
 import com.brspontes.studyproject.services.CustomerService
 import org.springframework.http.HttpStatus
@@ -23,24 +25,25 @@ import java.util.UUID
 class CustomerController(val customerService: CustomerService) {
 
     @GetMapping
-    fun getAll(@RequestParam name: String?): List<CustomerDto> {
-        return customerService.getAll(name)
+    fun getAll(@RequestParam name: String?): List<CustomerResponse> {
+        return customerService.getAll(name).map { it.toCustomerResponse() }
     }
 
     @GetMapping("/{id}")
-    fun getCustomer(@PathVariable id: Int): CustomerDto? {
-        return customerService.getCustomer(id)
+    fun getCustomer(@PathVariable id: Int): CustomerResponse? {
+        return customerService.getCustomer(id)!!.toCustomerResponse()
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateCustomer(@PathVariable id: String, @RequestBody customer: PutCustomerRequest) {
-       customerService.updateCustomer(customer.toCustomerModel(id.toInt()))
+    fun updateCustomer(@PathVariable id: Int, @RequestBody putCustomer: PutCustomerRequest) {
+        val customer = customerService.getCustomer(id)
+        customerService.updateCustomer(putCustomer.toCustomerModel(customer!!))
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateCustomer(@PathVariable id: Int) {
+    fun deleteCustomer(@PathVariable id: Int) {
         customerService.removeCustomer(id)
     }
 
