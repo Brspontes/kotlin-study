@@ -1,61 +1,90 @@
-package org.example.br.com.alura.alugames.principal
+package br.com.alura.alugames.principal
 
 import br.com.alura.alugames.modelo.Gamer
-import br.com.alura.alugames.servicos.Api
-import com.google.gson.Gson
-import org.example.br.com.alura.alugames.modelo.Game
-import org.example.br.com.alura.alugames.modelo.InfoGame
-import java.util.*
+import br.com.alura.alugames.modelo.Jogo
+import br.com.alura.alugames.servicos.ConsumoApi
+import java.util.Scanner
+import tranformarEmIdade
+
 
 fun main() {
     val leitura = Scanner(System.`in`)
     val gamer = Gamer.criarGamer(leitura)
+    println("Cadastro concluído com sucesso. Dados do gamer:")
+    println(gamer)
+    println("Idade do gamer: " + gamer.dataNascimento?.tranformarEmIdade())
+
     do {
-        println("Digite um id de jogo: ")
+        println("Digite um código de jogo para buscar:")
         val busca = leitura.nextLine()
 
-        val resultApi = Api().getData(busca)
+        val buscaApi = ConsumoApi()
+        val informacaoJogo = buscaApi.buscaJogo(busca)
 
-        val gson = Gson()
-        var myGame: Game? = null
-        val result = runCatching {
-            val infoGame = gson.fromJson(resultApi, InfoGame::class.java)
-            myGame = Game(infoGame.info.title, infoGame.info.thumb)
+
+        var meuJogo: Jogo? = null
+
+        val resultado = runCatching {
+            meuJogo = Jogo(
+                informacaoJogo.info.title,
+                informacaoJogo.info.thumb
+            )
         }
 
-        result.onFailure {
-            println("Jogo não encontrado")
+        resultado.onFailure {
+            println("Jogo inexistente. Tente outro id.")
         }
 
-        result.onSuccess {
-            println("Inserir descrição? S/N")
+        resultado.onSuccess {
+            println("Deseja inserir uma descrição personalizada? S/N")
             val opcao = leitura.nextLine()
             if (opcao.equals("s", true)) {
-                println("Digite a descrição")
-                val descricao = leitura.nextLine()
-                myGame?.descricao = descricao
+                println("Insira a descrição personalizado para o jogo:")
+                val descricaoPersonalizada = leitura.nextLine()
+                meuJogo?.descricao = descricaoPersonalizada
             } else {
-                myGame?.descricao = myGame?.titulo!!
+                meuJogo?.descricao = meuJogo?.titulo
+
             }
-            gamer.jogosBuscados.add(myGame)
+
+            gamer.jogosBuscados.add(meuJogo)
         }
-        println("Deseja consultar novo jogo? S/N")
-        val novoJogo = leitura.nextLine()
-    } while (novoJogo.equals("s", true))
 
-    println("Jogos buscados \n ${gamer.jogosBuscados} \n")
-    println("\n \n Jogos ordenados por título \n ${gamer.jogosBuscados.sortBy { it?.titulo }} \n")
+        println("Deseja buscar um novo jogo? S/N")
+        val resposta = leitura.nextLine()
+
+    } while (resposta.equals("s", true))
+
+    println("Jogos buscados:")
+    println(gamer.jogosBuscados)
+
+    println("\n Jogos ordenados por título: ")
+    gamer.jogosBuscados.sortBy {
+        it?.titulo
+    }
+
+    gamer.jogosBuscados.forEach {
+        println("Título: " + it?.titulo)
+    }
+
+    val jogosFiltrados = gamer.jogosBuscados.filter {
+        it?.titulo?.contains("batman", true) ?: false
+    }
+    println("\n Jogos filtrados: ")
+    println(jogosFiltrados)
+
+    println("Deseja excluir algum jogo da lista original? S/N")
+    val opcao = leitura.nextLine()
+    if (opcao.equals("s", true)) {
+        println(gamer.jogosBuscados)
+        println("\nInforme a posição do jogo que deseja excluir: ")
+        val posicao =leitura.nextInt()
+        gamer.jogosBuscados.removeAt(posicao)
+    }
+
+    println("\n Lista atualizada:")
+    println(gamer.jogosBuscados)
+
+    println("Busca finalizada com sucesso.")
+
 }
-
-//fun main () {
-//    val gamer1 = Gamer("Brian", "brian.robert16@hotmail.com")
-//    val gamer2 = Gamer("Brian", "brian.robert16@hotmail.com", "13/08/1995", "brspontes")
-//
-//    println(gamer1)
-//    println(gamer2)
-//
-//    gamer1.let {
-//        it.dataNascimento = "20/09/2000"
-//        it.usuario = "brspontes2"
-//    }
-//}
