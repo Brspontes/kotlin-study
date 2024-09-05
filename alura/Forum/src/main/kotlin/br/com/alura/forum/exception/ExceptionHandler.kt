@@ -19,6 +19,16 @@ class ExceptionHandler {
             path = request.servletPath)
     }
 
+    @ExceptionHandler(AccessDeniedException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleForbidden(excepetion: NotFoundException, request: HttpServletRequest) : ErrorResponse{
+        return ErrorResponse(
+            status = HttpStatus.NOT_FOUND.value(),
+            error = HttpStatus.NOT_FOUND.name,
+            message = excepetion.message!!,
+            path = request.servletPath)
+    }
+
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun handleInternalServerError(excepetion: NotFoundException, request: HttpServletRequest) : ErrorResponse{

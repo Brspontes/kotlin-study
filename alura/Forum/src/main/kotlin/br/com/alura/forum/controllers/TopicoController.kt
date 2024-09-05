@@ -2,10 +2,12 @@ package br.com.alura.forum.controllers
 
 import br.com.alura.forum.controllers.dto.AtualizacaoTopicoRequest
 import br.com.alura.forum.controllers.dto.NovoTopicoRequest
+import br.com.alura.forum.controllers.dto.TopicoPorCategoriaDto
 import br.com.alura.forum.controllers.dto.TopicoResponse
 import br.com.alura.forum.services.TopicoService
 import jakarta.transaction.Transactional
 import jakarta.validation.Valid
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,8 +17,13 @@ import org.springframework.web.util.UriComponentsBuilder
 @RequestMapping("/topicos")
 class TopicoController(private val service: TopicoService) {
     @GetMapping
-    fun listar(): List<TopicoResponse> {
-       return service.listar()
+    fun listar(@RequestParam(required = false) nomeCurso: String?): List<TopicoResponse> {
+       return service.listar(nomeCurso)
+    }
+
+    @GetMapping("/relatorio")
+    fun relatorio(): List<TopicoPorCategoriaDto> {
+        return service.relatorio()
     }
 
     @GetMapping("/{id}")
