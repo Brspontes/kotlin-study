@@ -8,10 +8,15 @@ import br.com.alura.forum.exception.NotFoundException
 import br.com.alura.forum.mapper.TopicoMapper
 import br.com.alura.forum.mapper.TopicoResponseMapper
 import br.com.alura.forum.repositories.TopicoRepository
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
+@EnableCaching
 class TopicoService(private val topicoRepository: TopicoRepository,
                     private val topicoResponseMapper: TopicoResponseMapper,
                     private val topicoMapper: TopicoMapper) {
@@ -25,6 +30,8 @@ class TopicoService(private val topicoRepository: TopicoRepository,
 
 //        topicos = Arrays.asList(topico1, topico2, topico3)
     }
+
+    @Cacheable(cacheNames = ["Topicos"], key = "#root.method.name")
     fun listar(nomeCurso: String?): List<TopicoResponse> {
         return if (nomeCurso != null)
             topicoRepository.findByCursoNome(nomeCurso)
@@ -39,20 +46,24 @@ class TopicoService(private val topicoRepository: TopicoRepository,
         return topicoResponseMapper.map(topico)
     }
 
+    @CacheEvict(cacheNames = ["Topicos"], allEntries = true)
     fun cadastrar(topico: NovoTopicoRequest): TopicoResponse {
         val topico = topicoMapper.map(topico)
         return topicoResponseMapper.map(topicoRepository.save(topico))
     }
 
+    @CacheEvict(cacheNames = ["Topicos"], allEntries = true)
     fun atualizar(topico: AtualizacaoTopicoRequest): TopicoResponse {
         val topicoFounded = topicoRepository.findById(topico.id).orElseThrow {NotFoundException("Tópico não encontrado")}
 
         topicoFounded.titulo = topico.titulo
         topicoFounded.mensagem = topico.mensagem
+        topicoFounded.dataAlteracao = LocalDateTime.now()
 
         return topicoResponseMapper.map(topicoRepository.save(topicoFounded))
     }
 
+    @CacheEvict(cacheNames = ["Topicos"], allEntries = true)
     fun deletar(id: Long) {
         val topicoFounded = topicoRepository.findById(id).orElseThrow {NotFoundException("Tópico não encontrado")}
         topicoRepository.delete(topicoFounded)

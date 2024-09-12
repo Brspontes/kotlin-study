@@ -1,0 +1,11 @@
+spring:
+  flyway:
+    baselineOnMigrate: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/pokemon
+    username: sa
+    password: 1wi46sS@
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true

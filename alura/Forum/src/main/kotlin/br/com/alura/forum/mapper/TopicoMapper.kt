@@ -15,6 +15,7 @@ class TopicoMapper(private val cursoService: CursoService,
             titulo = t.titulo,
             mensagem = t.mensagem,
             curso = cursoService.buscarPorId(t.idCurso).get(),
-            autor = autorService.buscarPorId(t.idAutor).get())
+            autor = autorService.buscarPorId(t.idAutor).get(),
+            dataAlteracao = null)
     }
 }

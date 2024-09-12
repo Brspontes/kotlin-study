@@ -12,13 +12,15 @@ data class Topico(
     @ManyToOne val curso: Curso,
     @ManyToOne val autor: Usuario,
     @Enumerated(value = EnumType.STRING) val status: StatusTpicoEnum = StatusTpicoEnum.NAO_RESPONDIDO,
-    @OneToMany(mappedBy = "topico") val respostas: List<Resposta> = ArrayList()
+    @OneToMany(mappedBy = "topico") val respostas: List<Resposta> = ArrayList(),
+    var dataAlteracao: LocalDateTime? = null
 ) {
     constructor(): this(
         id = null,
         titulo = "",
         mensagem = "",
         curso = Curso(),
-        autor = Usuario()
+        autor = Usuario(),
+        dataAlteracao = null
     )
 }

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component
 @Component
 class TopicoResponseMapper: Mapper<Topico, TopicoResponse> {
     override fun map(t: Topico): TopicoResponse {
-        return TopicoResponse(t.id!!, t.titulo, t.mensagem, t.status, t.dataCriacao)
+        return TopicoResponse(t.id!!, t.titulo, t.mensagem, t.status, t.dataCriacao, t.dataAlteracao)
     }
 }
